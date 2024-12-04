@@ -1,0 +1,36 @@
+class SudokuDLS {
+    public boolean solve(SudokuGraph graph, int depthLimit) {
+        return depthLimitedSearch(graph, depthLimit);
+    }
+
+    private boolean depthLimitedSearch(SudokuGraph graph, int depthLimit) {
+        if (depthLimit == 0) return false;
+
+        if (graph.isSolved()) {
+            System.out.println("Solved Sudoku using DLS:");
+            graph.printGrid();
+            return true;
+        }
+
+        for (int row = 0; row < graph.copyGrid().length; row++) {
+            for (int col = 0; col < graph.copyGrid()[row].length; col++) {
+                if (graph.copyGrid()[row][col] == 0) {
+                    List<Integer> possibleValues = graph.getPossibleValues(row, col);
+
+                    for (int value : possibleValues) {
+                        int[][] nextGrid = graph.copyGrid();
+                        nextGrid[row][col] = value;
+                        SudokuGraph nextGraph = new SudokuGraph(nextGrid);
+
+                        if (depthLimitedSearch(nextGraph, depthLimit - 1)) {
+                            return true;
+                        }
+                    }
+                    return false; // Backtrack
+                }
+            }
+        }
+
+        return false;
+    }
+}
