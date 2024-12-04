@@ -1,32 +1,42 @@
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
 class SudokuBFS {
     public boolean solve(SudokuGraph graph) {
         Queue<int[][]> queue = new LinkedList<>();
-        queue.add(graph.copyGrid());
+        queue.add(graph.copyGrid()); // Start with the initial grid
 
         while (!queue.isEmpty()) {
             int[][] currentGrid = queue.poll();
 
             SudokuGraph currentGraph = new SudokuGraph(currentGrid);
 
+            // Check if the current grid is solved
             if (currentGraph.isSolved()) {
                 System.out.println("Solved Sudoku using BFS:");
                 currentGraph.printGrid();
                 return true;
             }
 
+            // Find the first empty cell and generate possibilities
+            boolean foundEmptyCell = false;
             for (int row = 0; row < currentGrid.length; row++) {
                 for (int col = 0; col < currentGrid[row].length; col++) {
-                    if (currentGrid[row][col] == 0) {
+                    if (currentGrid[row][col] == 0) { // Empty cell found
                         List<Integer> possibleValues = currentGraph.getPossibleValues(row, col);
 
                         for (int value : possibleValues) {
                             int[][] nextGrid = currentGraph.copyGrid();
-                            nextGrid[row][col] = value;
-                            queue.add(nextGrid);
+                            nextGrid[row][col] = value; // Try a possible value
+                            queue.add(nextGrid); // Add the new state to the queue
                         }
-                        return false; // Process one cell at a time
+
+                        foundEmptyCell = true;
+                        break; // Process only one empty cell at a time
                     }
                 }
+                if (foundEmptyCell) break;
             }
         }
 
