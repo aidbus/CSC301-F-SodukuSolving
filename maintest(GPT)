@@ -14,12 +14,28 @@ public class Main {
 
         SudokuGraph graph = new SudokuGraph(sudokuGrid);
 
+        // BFS Solution
         System.out.println("Attempting BFS...");
         SudokuBFS bfsSolver = new SudokuBFS();
-        bfsSolver.solve(graph);
+        long bfsStartTime = System.nanoTime();
+        boolean bfsSolved = bfsSolver.solve(graph);
+        long bfsEndTime = System.nanoTime();
+        if (bfsSolved) {
+            System.out.println("BFS solved the puzzle in " + (bfsEndTime - bfsStartTime) / 1_000_000 + " ms.");
+        } else {
+            System.out.println("BFS failed to solve the puzzle.");
+        }
 
+        // DLS Solution
         System.out.println("Attempting DLS...");
         SudokuDLS dlsSolver = new SudokuDLS();
-        dlsSolver.solve(graph, 81); // Depth limit is the total number of cells
+        long dlsStartTime = System.nanoTime();
+        boolean dlsSolved = dlsSolver.solve(graph, 81); // Depth limit is the total number of cells
+        long dlsEndTime = System.nanoTime();
+        if (dlsSolved) {
+            System.out.println("DLS solved the puzzle in " + (dlsEndTime - dlsStartTime) / 1_000_000 + " ms.");
+        } else {
+            System.out.println("DLS failed to solve the puzzle.");
+        }
     }
 }
