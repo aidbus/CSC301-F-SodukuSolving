@@ -1,3 +1,5 @@
+import java.util.List;
+
 class SudokuDLS {
     public boolean solve(SudokuGraph graph, int depthLimit) {
         return depthLimitedSearch(graph, depthLimit);
