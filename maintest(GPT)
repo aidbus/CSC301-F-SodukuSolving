@@ -1,5 +1,6 @@
 public class Main {
     public static void main(String[] args) {
+        // Example Sudoku grid (0 represents empty cells)
         int[][] sudokuGrid = {
                 {5, 3, 0, 0, 7, 0, 0, 0, 0},
                 {6, 0, 0, 1, 9, 5, 0, 0, 0},
@@ -12,26 +13,28 @@ public class Main {
                 {0, 0, 0, 0, 8, 0, 0, 7, 9}
         };
 
-        SudokuGraph graph = new SudokuGraph(sudokuGrid);
-
-        // BFS Solution
+        // Run BFS
         System.out.println("Attempting BFS...");
+        SudokuGraph bfsGraph = new SudokuGraph(sudokuGrid); // Fresh graph for BFS
         SudokuBFS bfsSolver = new SudokuBFS();
-        long bfsStartTime = System.nanoTime();
-        boolean bfsSolved = bfsSolver.solve(graph);
-        long bfsEndTime = System.nanoTime();
+        long bfsStartTime = System.nanoTime(); // Start timing BFS
+        boolean bfsSolved = bfsSolver.solve(bfsGraph);
+        long bfsEndTime = System.nanoTime(); // End timing BFS
         if (bfsSolved) {
             System.out.println("BFS solved the puzzle in " + (bfsEndTime - bfsStartTime) / 1_000_000 + " ms.");
         } else {
             System.out.println("BFS failed to solve the puzzle.");
         }
 
-        // DLS Solution
+        System.out.println();
+
+        // Run DLS
         System.out.println("Attempting DLS...");
+        SudokuGraph dlsGraph = new SudokuGraph(sudokuGrid); // Fresh graph for DLS
         SudokuDLS dlsSolver = new SudokuDLS();
-        long dlsStartTime = System.nanoTime();
-        boolean dlsSolved = dlsSolver.solve(graph, 81); // Depth limit is the total number of cells
-        long dlsEndTime = System.nanoTime();
+        long dlsStartTime = System.nanoTime(); // Start timing DLS
+        boolean dlsSolved = dlsSolver.solve(dlsGraph, 81); // Depth limit is the total number of cells
+        long dlsEndTime = System.nanoTime(); // End timing DLS
         if (dlsSolved) {
             System.out.println("DLS solved the puzzle in " + (dlsEndTime - dlsStartTime) / 1_000_000 + " ms.");
         } else {
