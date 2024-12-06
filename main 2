@@ -1,0 +1,115 @@
+import java.io.*;
+
+public class Main {
+    public static void main(String[] args) {
+        // Initialize grids for easy, medium, and hard Sudoku puzzles
+        int[][] easyGrid = new int[9][9];
+        int[][] mediumGrid = new int[9][9];
+        int[][] hardGrid = new int[9][9];
+
+        // Read the grids from the file
+        try (BufferedReader reader = new BufferedReader(new FileReader("gridsforsudoku.txt"))) {
+            String line;
+            int currentGrid = -1;  // -1 = none, 0 = easy grid, 1 = medium grid, 2 = hard grid
+            int row = 0;
+
+            while ((line = reader.readLine()) != null) {
+                line = line.trim(); // Remove any leading/trailing whitespace
+
+                // Skip empty lines
+                if (line.isEmpty()) continue;
+
+                // Check difficulty level and assign to the correct grid
+                if (line.equalsIgnoreCase("easy")) {
+                    currentGrid = 0;
+                    row = 0; // Reset row for easy grid
+                } else if (line.equalsIgnoreCase("medium")) {
+                    currentGrid = 1;
+                    row = 0; // Reset row for medium grid
+                } else if (line.equalsIgnoreCase("hard")) {
+                    currentGrid = 2;
+                    row = 0; // Reset row for hard grid
+                } else if (currentGrid != -1) {
+                    // Read digits and store in the appropriate grid
+                    if (line.length() == 9) {
+                        for (int col = 0; col < line.length(); col++) {
+                            int num = Character.getNumericValue(line.charAt(col)); // Convert each character to an integer
+                            if (currentGrid == 0) {
+                                easyGrid[row][col] = num;
+                            } else if (currentGrid == 1) {
+                                mediumGrid[row][col] = num;
+                            } else if (currentGrid == 2) {
+                                hardGrid[row][col] = num;
+                            }
+                        }
+                        row++;
+                    } else {
+                        System.out.println("Skipping invalid line: '" + line + "'");
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Solve and time easy Grid with BFS and DLS
+        System.out.println("\nEasy Grid:");
+        solveAndTimeGrid("Easy", easyGrid);
+
+        // Solve and time Medium Grid with BFS and DLS
+        System.out.println("\nMedium Grid:");
+        solveAndTimeGrid("Medium", mediumGrid);
+
+        // Solve and time Hard Grid with BFS and DLS
+        System.out.println("\nHard Grid:");
+        solveAndTimeGrid("Hard", hardGrid);
+
+        // Create and solve an 8x8 grid
+        int[][] customGrid = createCustomGrid(9);
+        System.out.println("\nCustom Grid:");
+        solveAndTimeGrid("Custom", customGrid);
+    }
+
+    // Helper method to solve and print results for any grid
+    private static void solveAndTimeGrid(String difficulty, int[][] grid) {
+        // Solve with BFS
+        long bfsStartTime = System.nanoTime();
+        SudokuGraph bfsGraph = new SudokuGraph(grid);
+        SudokuBFS bfsSolver = new SudokuBFS();
+        boolean bfsSolved = bfsSolver.solve(bfsGraph);
+        long bfsEndTime = System.nanoTime();
+        if (bfsSolved) {
+            System.out.println(difficulty + " grid solved with BFS in " + (bfsEndTime - bfsStartTime) / 1_000_000 + " ms.");
+        } else {
+            System.out.println(difficulty + " grid BFS failed.");
+        }
+
+        // Solve with DLS
+        long dlsStartTime = System.nanoTime();
+        SudokuGraph dlsGraph = new SudokuGraph(grid);
+        SudokuDLS dlsSolver = new SudokuDLS();
+        boolean dlsSolved = dlsSolver.solve(dlsGraph, grid.length * grid.length); // Depth limit = total number of cells
+        long dlsEndTime = System.nanoTime();
+        if (dlsSolved) {
+            System.out.println(difficulty + " grid solved with DLS in " + (dlsEndTime - dlsStartTime) / 1_000_000 + " ms.");
+        } else {
+            System.out.println(difficulty + " grid DLS failed.");
+        }
+    }
+
+    // Helper method to create a custom grid of a given size
+    private static int[][] createCustomGrid(int size) {
+        int[][] grid = new int[size][size];
+        // Initialize the grid with some values or leave it empty for solving
+        // Example: Fill the diagonal subgrids with random values
+        int subGridSize = (int) Math.sqrt(size);
+        for (int i = 0; i < size; i += subGridSize) {
+            for (int j = 0; j < subGridSize; j++) {
+                for (int k = 0; k < subGridSize; k++) {
+                    grid[i + j][i + k] = (j * subGridSize + k + 1) % size + 1;
+                }
+            }
+        }
+        return grid;
+    }
+}
