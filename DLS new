@@ -1,32 +1,50 @@
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 class SudokuDLS {
+    private int solution_count = 0;  // Counter to track the number of solutions
+    private Set<String> solvedStates = new HashSet<>();  // Set to store solved grids and ensure uniqueness
+    private boolean printedSolution = false;  // Flag to check if a solution has been printed
+
     public boolean solve(SudokuGraph graph, int depthLimit) {
-        return depthLimitedSearch(graph, depthLimit);
+        boolean result = depthLimitedSearch(graph.copyGrid(), depthLimit);
+        System.out.println("Total solutions found: " + solution_count);
+        return result;
     }
 
-    private boolean depthLimitedSearch(SudokuGraph graph, int depthLimit) {
+    private boolean depthLimitedSearch(int[][] grid, int depthLimit) {
         if (depthLimit == 0) return false;
 
+        SudokuGraph graph = new SudokuGraph(grid);
         if (graph.isSolved()) {
-            System.out.println("DLS:");
-            graph.printGrid();
+            // Convert the solved grid to a string to compare if it's a new solution
+            String solvedGrid = gridToString(graph);
+            if (!solvedStates.contains(solvedGrid)) {
+                solvedStates.add(solvedGrid); // Mark this solution as unique
+                solution_count++; // Increment the solution count when a new solution is found
+
+                // Print the first solution
+                if (!printedSolution) {
+                    System.out.println("Solution:");
+                    graph.printGrid();
+                    printedSolution = true;
+                }
+            }
             return true;
         }
 
-        for (int row = 0; row < graph.copyGrid().length; row++) {
-            for (int col = 0; col < graph.copyGrid()[row].length; col++) {
-                if (graph.copyGrid()[row][col] == 0) {
+        for (int row = 0; row < grid.length; row++) {
+            for (int col = 0; col < grid[row].length; col++) {
+                if (grid[row][col] == 0) {
                     List<Integer> possibleValues = graph.getPossibleValues(row, col);
 
                     for (int value : possibleValues) {
-                        int[][] nextGrid = graph.copyGrid();
-                        nextGrid[row][col] = value;
-                        SudokuGraph nextGraph = new SudokuGraph(nextGrid);
-
-                        if (depthLimitedSearch(nextGraph, depthLimit - 1)) {
+                        grid[row][col] = value;
+                        if (depthLimitedSearch(grid, depthLimit - 1)) {
                             return true;
                         }
+                        grid[row][col] = 0; // Backtrack
                     }
                     return false; // Backtrack
                 }
@@ -34,5 +52,17 @@ class SudokuDLS {
         }
 
         return false;
+    }
+
+    // Converts the grid to a string representation for uniqueness check
+    private String gridToString(SudokuGraph graph) {
+        StringBuilder sb = new StringBuilder();
+        int[][] grid = graph.copyGrid();
+        for (int[] row : grid) {
+            for (int cell : row) {
+                sb.append(cell);
+            }
+        }
+        return sb.toString();
     }
 }
