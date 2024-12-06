@@ -1,24 +1,33 @@
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 
 class SudokuBFS {
-    private int stateCount = 0; // Counter to track the number of states explored
+    private int solution_count = 0;  // Counter to track the number of solutions
+    private Set<String> solvedStates = new HashSet<>();  // Set to store solved grids and ensure uniqueness
 
     public boolean solve(SudokuGraph graph) {
         Queue<SudokuGraph> queue = new LinkedList<>();
-        queue.add(graph); // Start with the initial grid as a SudokuGraph instance
+        queue.add(graph);
 
         while (!queue.isEmpty()) {
-            SudokuGraph currentGraph = queue.poll(); // Get the next graph from the queue
-            stateCount++; // Increment the counter whenever a state is dequeued
+            SudokuGraph currentGraph = queue.poll();
 
             // Check if the current grid is solved
             if (currentGraph.isSolved()) {
-                System.out.println("BFS:");
-                currentGraph.printGrid();
-                System.out.println("BFS explored " + stateCount + " states.");
-                return true;
+                // Convert the solved grid to a string to compare if it's a new solution
+                String solvedGrid = gridToString(currentGraph);
+                if (!solvedStates.contains(solvedGrid)) {
+                    solvedStates.add(solvedGrid); // Mark this solution as unique
+                    solution_count++; // Increment the solution count when a new solution is found
+
+
+                    // Optionally print the solution
+                    System.out.println("Solution " + solution_count + ":");
+                    currentGraph.printGrid();
+                }
             }
 
             // Find the first empty cell and generate possibilities for it
@@ -46,9 +55,21 @@ class SudokuBFS {
             }
         }
 
-        System.out.println("No solution found using BFS.");
-        System.out.println("BFS explored " + stateCount + " states.");
-        System.out.println(" ");
-        return false;
+        // If no solution was found, return false
+        System.out.println("Total solutions found: " + solution_count);
+        return solution_count > 0;
+    }
+
+    // Converts the grid to a string representation for uniqueness check
+    private String gridToString(SudokuGraph graph) {
+        StringBuilder sb = new StringBuilder();
+        int[][] grid = graph.copyGrid();
+        for (int[] row : grid) {
+            for (int cell : row) {
+                sb.append(cell);
+            }
+        }
+        return sb.toString();
     }
 }
+
