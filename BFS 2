@@ -1,0 +1,54 @@
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
+class SudokuBFS {
+    private int stateCount = 0; // Counter to track the number of states explored
+
+    public boolean solve(SudokuGraph graph) {
+        Queue<SudokuGraph> queue = new LinkedList<>();
+        queue.add(graph); // Start with the initial grid as a SudokuGraph instance
+
+        while (!queue.isEmpty()) {
+            SudokuGraph currentGraph = queue.poll(); // Get the next graph from the queue
+            stateCount++; // Increment the counter whenever a state is dequeued
+
+            // Check if the current grid is solved
+            if (currentGraph.isSolved()) {
+                System.out.println("BFS:");
+                currentGraph.printGrid();
+                System.out.println("BFS explored " + stateCount + " states.");
+                return true;
+            }
+
+            // Find the first empty cell and generate possibilities for it
+            boolean foundEmptyCell = false;
+            for (int row = 0; row < currentGraph.copyGrid().length; row++) {
+                for (int col = 0; col < currentGraph.copyGrid()[row].length; col++) {
+                    if (currentGraph.copyGrid()[row][col] == 0) { // Empty cell found
+                        List<Integer> possibleValues = currentGraph.getPossibleValues(row, col);
+
+                        for (int value : possibleValues) {
+                            // Create a new grid with the current value filled in
+                            int[][] nextGrid = currentGraph.copyGrid();
+                            nextGrid[row][col] = value;
+                            SudokuGraph nextGraph = new SudokuGraph(nextGrid); // Create a new SudokuGraph
+
+                            // Add the new graph to the queue to explore further
+                            queue.add(nextGraph);
+                        }
+
+                        foundEmptyCell = true;
+                        break; // Process only one empty cell at a time
+                    }
+                }
+                if (foundEmptyCell) break;
+            }
+        }
+
+        System.out.println("No solution found using BFS.");
+        System.out.println("BFS explored " + stateCount + " states.");
+        System.out.println(" ");
+        return false;
+    }
+}
