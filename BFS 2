@@ -3,10 +3,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
+import java.util.Arrays;
 
 class SudokuBFS {
     private int solution_count = 0;  // Counter to track the number of solutions
     private Set<String> solvedStates = new HashSet<>();  // Set to store solved grids and ensure uniqueness
+    private boolean printedSolution = false;  // Flag to check if a solution has been printed
 
     public boolean solve(SudokuGraph graph) {
         Queue<SudokuGraph> queue = new LinkedList<>();
@@ -23,18 +25,21 @@ class SudokuBFS {
                     solvedStates.add(solvedGrid); // Mark this solution as unique
                     solution_count++; // Increment the solution count when a new solution is found
 
-
-                    // Optionally print the solution
-                    System.out.println("Solution " + solution_count + ":");
-                    currentGraph.printGrid();
+                    // Print the first solution
+                    if (!printedSolution) {
+                        System.out.println("Solution:");
+                        currentGraph.printGrid();
+                        printedSolution = true;
+                    }
                 }
+                continue; // Continue to explore other possible solutions
             }
 
             // Find the first empty cell and generate possibilities for it
             boolean foundEmptyCell = false;
-            for (int row = 0; row < currentGraph.copyGrid().length; row++) {
-                for (int col = 0; col < currentGraph.copyGrid()[row].length; col++) {
-                    if (currentGraph.copyGrid()[row][col] == 0) { // Empty cell found
+            for (int row = 0; row < currentGraph.getSize(); row++) {
+                for (int col = 0; col < currentGraph.getSize(); col++) {
+                    if (currentGraph.getCell(row, col) == 0) { // Empty cell found
                         List<Integer> possibleValues = currentGraph.getPossibleValues(row, col);
 
                         for (int value : possibleValues) {
@@ -55,7 +60,7 @@ class SudokuBFS {
             }
         }
 
-        // If no solution was found, return false
+        // Print the total number of solutions found
         System.out.println("Total solutions found: " + solution_count);
         return solution_count > 0;
     }
@@ -72,4 +77,3 @@ class SudokuBFS {
         return sb.toString();
     }
 }
-
