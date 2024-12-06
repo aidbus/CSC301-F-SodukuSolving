@@ -1,0 +1,72 @@
+import java.util.*;
+
+class SudokuGraph {
+    private final int[][] grid; // Sudoku grid
+    private final int size; // Size of the grid (e.g., 9 for a 9x9 grid)
+
+    public SudokuGraph(int[][] grid) {
+        this.grid = grid;
+        this.size = grid.length;
+    }
+
+    // Returns possible values for a cell based on Sudoku rules
+    public List<Integer> getPossibleValues(int row, int col) {
+        if (grid[row][col] != 0) return Collections.singletonList(grid[row][col]);
+
+        boolean[] used = new boolean[size + 1]; // Tracks used numbers (1 to size)
+
+        // Check row and column
+        for (int i = 0; i < size; i++) {
+            if (grid[row][i] != 0) used[grid[row][i]] = true;
+            if (grid[i][col] != 0) used[grid[i][col]] = true;
+        }
+
+        // Check subgrid
+        int subGridSize = (int) Math.sqrt(size);
+        int startRow = (row / subGridSize) * subGridSize;
+        int startCol = (col / subGridSize) * subGridSize;
+
+        for (int i = startRow; i < startRow + subGridSize; i++) {
+            for (int j = startCol; j < startCol + subGridSize; j++) {
+                if (grid[i][j] != 0) used[grid[i][j]] = true;
+            }
+        }
+
+        // Collect unused numbers
+        List<Integer> possibleValues = new ArrayList<>();
+        for (int num = 1; num <= size; num++) {
+            if (!used[num]) possibleValues.add(num);
+        }
+
+        return possibleValues;
+    }
+
+
+    // Checks if the puzzle is solved
+    public boolean isSolved() {
+        for (int[] row : grid) {
+            for (int cell : row) {
+                if (cell == 0) return false;
+            }
+        }
+        return true;
+    }
+
+    // Prints the grid
+    public void printGrid() {
+        for (int[] row : grid) {
+            System.out.println(Arrays.toString(row));
+        }
+        System.out.println();
+    }
+
+    // Creates a deep copy of the grid
+    public int[][] copyGrid() {
+        int[][] copy = new int[size][size]; // Create a new grid of the same size
+        for (int i = 0; i < size; i++) {
+            System.arraycopy(grid[i], 0, copy[i], 0, size); // Copy each row
+        }
+        return copy;
+    }
+
+}
