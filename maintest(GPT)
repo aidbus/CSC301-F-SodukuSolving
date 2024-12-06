@@ -2,7 +2,7 @@ import java.io.*;
 
 public class Main {
     public static void main(String[] args) {
-        // Create 3 Sudoku grids for easy, medium, and hard difficulties
+        // Initialize grids for easy, medium, and hard Sudoku puzzles
         int[][] easyGrid = new int[9][9];
         int[][] mediumGrid = new int[9][9];
         int[][] hardGrid = new int[9][9];
@@ -15,9 +15,11 @@ public class Main {
 
             while ((line = reader.readLine()) != null) {
                 line = line.trim(); // Remove any leading/trailing whitespace
+
                 // Skip empty lines
                 if (line.isEmpty()) continue;
-                // Check difficulty level
+
+                // Check difficulty level and assign to the correct grid
                 if (line.equalsIgnoreCase("easy")) {
                     currentGrid = 0;
                     row = 0; // Reset row for easy grid
@@ -28,7 +30,7 @@ public class Main {
                     currentGrid = 2;
                     row = 0; // Reset row for hard grid
                 } else if (currentGrid != -1) {
-                    // read 9 digits and store in the right grid
+                    // Read 9 digits and store in the appropriate grid
                     if (line.length() == 9) {
                         for (int col = 0; col < 9; col++) {
                             int num = Character.getNumericValue(line.charAt(col)); // Convert each character to an integer
@@ -50,52 +52,44 @@ public class Main {
             e.printStackTrace();
         }
 
-        // Solve and print results for each grid
-        solveAndPrint("Easy", easyGrid);
-        solveAndPrint("Medium", mediumGrid);
-        solveAndPrint("Hard", hardGrid);
+        // Solve and time easy Grid with BFS and DLS
+        System.out.println("\nEasy Grid:");
+        solveAndTimeGrid("Easy", easyGrid);
+
+        // Solve and time Medium Grid with BFS and DLS
+        System.out.println("\nMedium Grid:");
+        solveAndTimeGrid("Medium", mediumGrid);
+
+        // Solve and time Hard Grid with BFS and DLS
+        System.out.println("\nHard Grid:");
+        solveAndTimeGrid("Hard", hardGrid);
     }
 
-    // Helper method to solve and print results
-    private static void solveAndPrint(String difficulty, int[][] grid) {
-        System.out.println("Attempting to solve " + difficulty + " Sudoku grid...");
-
-        // Run BFS
-        SudokuGraph bfsGraph = new SudokuGraph(grid); // Fresh graph for BFS
+    // Helper method to solve and print results for any grid
+    private static void solveAndTimeGrid(String difficulty, int[][] grid) {
+        // Solve with BFS
+        long bfsStartTime = System.nanoTime();
+        SudokuGraph bfsGraph = new SudokuGraph(grid);
         SudokuBFS bfsSolver = new SudokuBFS();
-        long bfsStartTime = System.nanoTime(); // Start timing BFS
         boolean bfsSolved = bfsSolver.solve(bfsGraph);
-        long bfsEndTime = System.nanoTime(); // End timing BFS
+        long bfsEndTime = System.nanoTime();
         if (bfsSolved) {
-            System.out.println(difficulty + " BFS solved the puzzle in " + (bfsEndTime - bfsStartTime) / 1_000_000 + " ms.");
+            System.out.println(difficulty + " grid solved with BFS in " + (bfsEndTime - bfsStartTime) / 1_000_000 + " ms.");
         } else {
-            System.out.println(difficulty + " BFS failed to solve the puzzle.");
+            System.out.println(difficulty + " grid BFS failed.");
         }
 
-        // Run DLS
-        SudokuGraph dlsGraph = new SudokuGraph(grid); // Fresh graph for DLS
+        // Solve with DLS
+        long dlsStartTime = System.nanoTime();
+        SudokuGraph dlsGraph = new SudokuGraph(grid);
         SudokuDLS dlsSolver = new SudokuDLS();
-        long dlsStartTime = System.nanoTime(); // Start timing DLS
-        boolean dlsSolved = dlsSolver.solve(dlsGraph, 81); // Depth limit is the total number of cells
-        long dlsEndTime = System.nanoTime(); // End timing DLS
+        boolean dlsSolved = dlsSolver.solve(dlsGraph, 81); // Depth limit = 81 (total number of cells)
+        long dlsEndTime = System.nanoTime();
         if (dlsSolved) {
-            System.out.println(difficulty + " DLS solved the puzzle in " + (dlsEndTime - dlsStartTime) / 1_000_000 + " ms.");
+            System.out.println(difficulty + " grid solved with DLS in " + (dlsEndTime - dlsStartTime) / 1_000_000 + " ms.");
         } else {
-            System.out.println(difficulty + " DLS failed to solve the puzzle.");
-        }
-
-        // Optionally print the solved grid
-        //System.out.println(difficulty + " Solved Sudoku Grid:");
-        //printGrid(grid);
-    }
-
-    // Helper method to print a Sudoku grid
-    public static void printGrid(int[][] grid) {
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                System.out.print(grid[i][j] + " ");
-            }
-            System.out.println();
+            System.out.println(difficulty + " grid DLS failed.");
         }
     }
 }
+
