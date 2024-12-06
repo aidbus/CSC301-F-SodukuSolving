@@ -41,7 +41,6 @@ class SudokuGraph {
         return possibleValues;
     }
 
-
     // Checks if the puzzle is solved
     public boolean isSolved() {
         for (int[] row : grid) {
@@ -69,4 +68,13 @@ class SudokuGraph {
         return copy;
     }
 
+    // Get the size of the grid
+    public int getSize() {
+        return size;
+    }
+
+    // Get the value of a cell
+    public int getCell(int row, int col) {
+        return grid[row][col];
+    }
 }
