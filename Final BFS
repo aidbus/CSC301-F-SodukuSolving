@@ -1,5 +1,8 @@
-// class searches for sudoku solutions using graph and breadth-first search
-// dec 6 2024
+// Program 3: BFS Class - uses graph and BFS to solve puzzles
+// Aidan Tarpinian & Josephine Nelson
+// Dr. Lori CSC301
+// 6 December 2024
+
 import java.util.*;
 
 class SudokuBFS {
