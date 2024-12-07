@@ -1,3 +1,5 @@
+// class searches for sudoku solutions using graph and breadth-first search
+// dec 6 2024
 import java.util.*;
 
 class SudokuBFS {
