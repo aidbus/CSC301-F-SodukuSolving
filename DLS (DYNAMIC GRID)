@@ -1,0 +1,61 @@
+  import java.util.*;
+
+class SudokuDLS {
+    private List<int[][]> solutions = new LinkedList<>(); // To store multiple solutions
+    private Set<String> solvedStates = new HashSet<>();  // For uniqueness check
+    private int solutionCount = 0;
+
+    public boolean solve(SudokuGraph graph, int depthLimit) {
+        depthLimitedSearch(graph.copyGrid(), depthLimit);
+        System.out.println("Total solutions found by DLS: " + solutionCount);
+        return solutionCount > 0; // Return true if at least one solution was found, otherwise false
+    }
+
+    private void depthLimitedSearch(int[][] grid, int depthLimit) {
+        if (depthLimit == 0) return;
+
+        SudokuGraph graph = new SudokuGraph(grid);
+        if (graph.isSolved()) {
+            // Convert the solved grid to a string to compare if it's a new solution
+            String solvedGrid = gridToString(graph);
+            if (!solvedStates.contains(solvedGrid)) {
+                solvedStates.add(solvedGrid); // Mark this solution as unique
+                solutions.add(graph.copyGrid());
+                solutionCount++;
+
+                // Debugging: Print the first solution
+                System.out.println("Solution found:");
+                graph.printGrid();
+            }
+            return;
+        }
+
+        for (int row = 0; row < grid.length; row++) {
+            for (int col = 0; col < grid[row].length; col++) {
+                if (grid[row][col] == 0) {
+                    List<Integer> possibleValues = graph.getPossibleValues(row, col);
+
+                    for (int value : possibleValues) {
+                        grid[row][col] = value;
+                        depthLimitedSearch(grid, depthLimit - 1);
+                        grid[row][col] = 0; // Backtrack
+                    }
+                    return; // Backtrack
+                }
+            }
+        }
+    }
+
+    // Converts the grid to a string representation for uniqueness check
+    private String gridToString(SudokuGraph graph) {
+        StringBuilder sb = new StringBuilder();
+        int[][] grid = graph.copyGrid();
+        for (int[] row : grid) {
+            for (int cell : row) {
+                sb.append(cell);
+            }
+        }
+        return sb.toString();
+    }
+}
+
