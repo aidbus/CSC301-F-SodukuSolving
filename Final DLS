@@ -1,0 +1,47 @@
+import java.util.List;
+
+class SudokuDLS {
+    private int solutionCount = 0;  // To track the number of solutions found
+
+    public boolean solve(SudokuGraph graph, int depthLimit) {
+        boolean result = depthLimitedSearch(graph.copyGrid(), depthLimit);
+        System.out.println("Total solutions found by DLS: " + solutionCount);
+        return solutionCount > 0; // Return true if at least one solution is found
+    }
+
+    private boolean depthLimitedSearch(int[][] grid, int depthLimit) {
+        if (depthLimit == 0) return false;
+
+        SudokuGraph graph = new SudokuGraph(grid);
+        if (graph.isSolved()) {
+            // If a solution is found, increment the solution count and return true
+            solutionCount++;
+            // Print the first solution
+            if (solutionCount == 1) {
+                System.out.println("Solution found by DLS:");
+                graph.printGrid();
+            }
+            return true; // Stop further recursion after finding the first solution
+        }
+
+        // Perform the depth-limited search
+        for (int row = 0; row < grid.length; row++) {
+            for (int col = 0; col < grid[row].length; col++) {
+                if (grid[row][col] == 0) { // Found an empty cell
+                    List<Integer> possibleValues = graph.getPossibleValues(row, col);
+
+                    for (int value : possibleValues) {
+                        grid[row][col] = value;
+                        if (depthLimitedSearch(grid, depthLimit - 1)) {
+                            return true; // Return true after finding the solution
+                        }
+                        grid[row][col] = 0; // Backtrack
+                    }
+                    return false; // Backtrack if no solution is found at this level
+                }
+            }
+        }
+
+        return false;
+    }
+}
