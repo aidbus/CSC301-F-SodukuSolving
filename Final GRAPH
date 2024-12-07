@@ -1,15 +1,17 @@
+// imports
 import java.util.*;
 
 class SudokuGraph {
-    private final int[][] grid; // Sudoku grid
-    private final int size; // Size of the grid (e.g., 9 for a 9x9 grid)
+    private final int[][] grid; // make sudoku grid
+    private final int size; // set size of 2D grid
 
+    // set size and grid
     public SudokuGraph(int[][] grid) {
         this.grid = grid;
         this.size = grid.length;
     }
 
-    // Returns possible values for a cell based on Sudoku rules
+    // returns possible values for a cell based on sudoku rules
     public List<Integer> getPossibleValues(int row, int col) {
         if (grid[row][col] != 0) return Collections.singletonList(grid[row][col]); // Already filled
 
