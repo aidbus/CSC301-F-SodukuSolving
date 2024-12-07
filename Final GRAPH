@@ -1,0 +1,83 @@
+import java.util.*;
+
+class SudokuGraph {
+    private final int[][] grid; // Sudoku grid
+    private final int size; // Size of the grid (e.g., 9 for a 9x9 grid)
+
+    public SudokuGraph(int[][] grid) {
+        this.grid = grid;
+        this.size = grid.length;
+    }
+
+    // Returns possible values for a cell based on Sudoku rules
+    public List<Integer> getPossibleValues(int row, int col) {
+        if (grid[row][col] != 0) return Collections.singletonList(grid[row][col]); // Already filled
+
+        boolean[] used = new boolean[size + 1]; // Tracks used numbers (1 to size)
+
+        // Check row and column
+        for (int i = 0; i < size; i++) {
+            if (grid[row][i] != 0) used[grid[row][i]] = true; // Row check
+            if (grid[i][col] != 0) used[grid[i][col]] = true; // Column check
+        }
+
+        // Check subgrid (rectangular subgrid handling for non-square grids)
+        int subGridRowSize = (int) Math.sqrt(size);  // Typically for square grids
+        int subGridColSize = size / subGridRowSize; // Handling rectangular grids too
+
+        int subGridRowStart = (row / subGridRowSize) * subGridRowSize;
+        int subGridColStart = (col / subGridColSize) * subGridColSize;
+
+        // Iterate over subgrid cells to mark used numbers
+        for (int i = subGridRowStart; i < subGridRowStart + subGridRowSize; i++) {
+            for (int j = subGridColStart; j < subGridColStart + subGridColSize; j++) {
+                if (grid[i][j] != 0) used[grid[i][j]] = true; // Subgrid check
+            }
+        }
+
+        // Collect unused numbers
+        List<Integer> possibleValues = new ArrayList<>();
+        for (int num = 1; num <= size; num++) {
+            if (!used[num]) possibleValues.add(num); // Only add unused numbers
+        }
+
+        return possibleValues;
+    }
+
+    // Checks if the puzzle is solved
+    public boolean isSolved() {
+        for (int[] row : grid) {
+            for (int cell : row) {
+                if (cell == 0) return false; // If any cell is 0, the puzzle is not solved
+            }
+        }
+        return true; // All cells are filled
+    }
+
+    // Prints the grid
+    public void printGrid() {
+        for (int[] row : grid) {
+            System.out.println(Arrays.toString(row));
+        }
+        System.out.println();
+    }
+
+    // Creates a deep copy of the grid
+    public int[][] copyGrid() {
+        int[][] copy = new int[size][size]; // Create a new grid of the same size
+        for (int i = 0; i < size; i++) {
+            System.arraycopy(grid[i], 0, copy[i], 0, size); // Copy each row
+        }
+        return copy;
+    }
+
+    // Get the size of the grid
+    public int getSize() {
+        return size;
+    }
+
+    // Get the value of a cell
+    public int getCell(int row, int col) {
+        return grid[row][col];
+    }
+}
