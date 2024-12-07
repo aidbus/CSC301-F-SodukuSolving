@@ -1,38 +1,39 @@
-// Main program to solve Sudoku puzzle given 3 difficulties, an inputed grid from file or custom grid of various sizes
-//Code by Aiden Tarpinian and Josie Nelson
-// Dec 6 2024
+// Program 3: Main Class - solves various puzzles from file or custom grid inputed by user
+// Aidan Tarpinian & Josephine Nelson
+// Dr. Lori CSC 301
+// 6 December 2024
 
-// inspired by "Comparison Analysis of Breadth First Search and Depth Limited Search Algorithms in Sudoku Game"
-// by Tirsa Ninia Lina and Matheus Supriyanto Rumetna
-// https://www.researchgate.net/publication/358642884_Comparison_Analysis_of_Breadth_First_Search_and_Depth_Limited_Search_Algorithms_in_Sudoku_Game
+// Reference: Lina, Tirsa & Rumetna, Matheus. (2021). Comparison Analysis of Breadth First-
+// Search and Depth Limited Search Algorithms in Sudoku Game. Bulletin of Computer Science- 
+// and Electrical Engineering. 2. 74-83. 10.25008/bcsee.v2i2.1146. 
 
-// imports
+
 import java.io.*;
 import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
-        // read in file of three grids
+        // Read the grids from the file
         try (BufferedReader reader = new BufferedReader(new FileReader("src/gridsforsudoku.txt"))) {
             int[][] easyGrid = readGrid(reader);   // Read Easy grid
             int[][] mediumGrid = readGrid(reader); // Read Medium grid
             int[][] hardGrid = readGrid(reader);   // Read Hard grid
 
-            // solve+time easy grid with BFS and DLS
+            // Solve and time the Easy grid with BFS and DLS
             System.out.println("==================================\nEASY GRID:\n");
             solveAndTimeGrid("Easy", easyGrid);
 
-            // solve+time medium grid with BFS and DLS
+            // Solve and time the Medium grid with BFS and DLS
             System.out.println("==================================\nMEDIUM GRID:\n");
             solveAndTimeGrid("Medium", mediumGrid);
 
-            /// solve+time hard grid with BFS and DLS
+            // Solve and time the Hard grid with BFS and DLS
             System.out.println("==================================\nHARD GRID:\n");
             solveAndTimeGrid("Hard", hardGrid);
 
-            // create and solve a custom grid !
-            int[][] customGrid = createCustomGrid(9); // put the size of the custom grid here! it will turn it into a square
-            System.out.println("\nCUSTOM GRID:\n");
+            // Create and solve a custom grid
+            int[][] customGrid = createCustomGrid(9); // Specify the size of the custom grid here
+            System.out.println("==================================\nCUSTOM GRID:\n");
             solveAndTimeGrid("Custom", customGrid);
 
         } catch (IOException e) {
@@ -40,9 +41,9 @@ public class Main {
         }
     }
 
-    // helper method to solve and print results for any grid
+    // Helper method to solve and print results for any grid
     private static void solveAndTimeGrid(String difficulty, int[][] grid) {
-        // solve with BFS and time in nanoseconds
+        // Solve with BFS
         long bfsStartTime = System.nanoTime();
         SudokuGraph bfsGraph = new SudokuGraph(grid);
         SudokuBFS bfsSolver = new SudokuBFS();
@@ -54,7 +55,7 @@ public class Main {
             System.out.println(difficulty + " grid BFS failed.\n");
         }
 
-        // solve with DLS and time in nanoseconds
+        // Solve with DLS
         long dlsStartTime = System.nanoTime();
         SudokuGraph dlsGraph = new SudokuGraph(grid);
         SudokuDLS dlsSolver = new SudokuDLS();
@@ -68,37 +69,38 @@ public class Main {
     }
 
 
-    // helper method to read a grid dynamically based on the size in the text file
+    // Helper method to read a grid dynamically based on the size in the .txt file
     private static int[][] readGrid(BufferedReader reader) throws IOException {
         String line;
 
-        // skip difficulty level lines in file
+        // Skip difficulty level lines like 'easy', 'medium', 'hard'
         while ((line = reader.readLine()) != null && (line.equalsIgnoreCase("easy") || line.equalsIgnoreCase("medium") || line.equalsIgnoreCase("hard"))) {
+            // Skip difficulty labels
         }
 
-        // read the first valid line to set the grid size
+        // Read the first valid line to determine the grid size
         if (line == null || line.trim().isEmpty()) {
             throw new IllegalArgumentException("Invalid grid format: No valid rows found.");
         }
 
-        int gridSize = line.length();  // The len of the first line determines the grid size (as square)
+        int gridSize = line.length();  // The length of the first line determines the grid size (columns)
         int[][] grid = new int[gridSize][gridSize];
 
-        // read the grid!- thank you chat gpt for the help
+        // Now, read the grid
         int row = 0;
         do {
-            line = line.trim();  // trim whitespace
+            line = line.trim();  // Trim any whitespace
             if (line.length() == gridSize) {
                 for (int col = 0; col < gridSize; col++) {
-                    grid[row][col] = Character.getNumericValue(line.charAt(col));  // make each character a number
+                    grid[row][col] = Character.getNumericValue(line.charAt(col));  // Convert each character to a number
                 }
-                row++; // go through each row
+                row++;
             } else {
                 System.out.println("Skipping invalid line: '" + line + "'");
             }
         } while ((line = reader.readLine()) != null && row < gridSize);
 
-        // in case grid doesn't match the expected dimensions
+        // Handle case where the grid doesn't match the expected dimensions
         if (row != gridSize) {
             throw new IllegalArgumentException("Grid dimensions do not match: Expected " + gridSize + "x" + gridSize + " grid.");
         }
@@ -106,10 +108,11 @@ public class Main {
         return grid;
     }
 
-    // helper method to create a custom grid of a given size - thanks chat gpt
+    // Helper method to create a custom grid of a given size
     private static int[][] createCustomGrid(int size) {
         int[][] grid = new int[size][size];
-        // initialize grid with values on subgrid diagonals, empty elsewhere
+        // Initialize the grid with some values or leave it empty for solving
+        // Example: Fill the diagonal subgrids with values
         int subGridSize = (int) Math.sqrt(size);
         for (int i = 0; i < size; i += subGridSize) {
             for (int j = 0; j < subGridSize; j++) {
