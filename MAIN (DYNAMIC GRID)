@@ -1,0 +1,101 @@
+MAIN  import java.io.*;
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        // Read the grids from the file
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/gridsforsudoku.txt"))) {
+            int[][] easyGrid = readGrid(reader);   // Read Easy grid
+            int[][] mediumGrid = readGrid(reader); // Read Medium grid
+            int[][] hardGrid = readGrid(reader);   // Read Hard grid
+
+            // Solve and time the Easy grid with BFS and DLS
+            System.out.println("\nEasy Grid:");
+            solveAndTimeGrid("Easy", easyGrid);
+
+            // Solve and time the Medium grid with BFS and DLS
+            System.out.println("\nMedium Grid:");
+            solveAndTimeGrid("Medium", mediumGrid);
+
+            // Solve and time the Hard grid with BFS and DLS
+            System.out.println("\nHard Grid:");
+            solveAndTimeGrid("Hard", hardGrid);
+
+        } catch (IOException e) {
+            System.out.println("Error reading the file: " + e.getMessage());
+        }
+    }
+
+    // Helper method to solve and print results for any grid
+    private static void solveAndTimeGrid(String difficulty, int[][] grid) {
+        // Solve with BFS
+        long bfsStartTime = System.nanoTime();
+        SudokuGraph bfsGraph = new SudokuGraph(grid);
+        SudokuBFS bfsSolver = new SudokuBFS();
+        boolean bfsSolved = bfsSolver.solve(bfsGraph);
+        long bfsEndTime = System.nanoTime();
+        if (bfsSolved) {
+            System.out.println(difficulty + " grid solved with BFS in " + (bfsEndTime - bfsStartTime) / 1_000_000 + " ms.");
+        } else {
+            System.out.println(difficulty + " grid BFS failed.");
+        }
+
+        // Solve with DLS
+        long dlsStartTime = System.nanoTime();
+        SudokuGraph dlsGraph = new SudokuGraph(grid);
+        SudokuDLS dlsSolver = new SudokuDLS();
+        boolean dlsSolved = dlsSolver.solve(dlsGraph, grid.length * grid.length); // Depth limit = total number of cells
+        long dlsEndTime = System.nanoTime();
+        if (dlsSolved) {
+            System.out.println(difficulty + " grid solved with DLS in " + (dlsEndTime - dlsStartTime) / 1_000_000 + " ms.");
+        } else {
+            System.out.println(difficulty + " grid DLS failed.");
+        }
+    }
+
+    // Helper method to read a grid dynamically based on the size in the .txt file
+    private static int[][] readGrid(BufferedReader reader) throws IOException {
+        String line;
+
+        // Skip difficulty level lines like 'easy', 'medium', 'hard'
+        while ((line = reader.readLine()) != null && (line.equalsIgnoreCase("easy") || line.equalsIgnoreCase("medium") || line.equalsIgnoreCase("hard"))) {
+            // Skip difficulty labels
+        }
+
+        // Read the first valid line to determine the grid size
+        if (line == null || line.trim().isEmpty()) {
+            throw new IllegalArgumentException("Invalid grid format: No valid rows found.");
+        }
+
+        int gridSize = line.length();  // The length of the first line determines the grid size (columns)
+        int[][] grid = new int[gridSize][gridSize];
+
+        // Now, read the grid
+        int row = 0;
+        do {
+            line = line.trim();  // Trim any whitespace
+            if (line.length() == gridSize) {
+                for (int col = 0; col < gridSize; col++) {
+                    grid[row][col] = Character.getNumericValue(line.charAt(col));  // Convert each character to a number
+                }
+                row++;
+            } else {
+                System.out.println("Skipping invalid line: '" + line + "'");
+            }
+        } while ((line = reader.readLine()) != null && row < gridSize);
+
+        // Handle case where the grid doesn't match the expected dimensions
+        if (row != gridSize) {
+            throw new IllegalArgumentException("Grid dimensions do not match: Expected " + gridSize + "x" + gridSize + " grid.");
+        }
+
+        // Debugging: Print the grid after reading it
+        System.out.println("Grid read from file:");
+        for (int[] r : grid) {
+            System.out.println(Arrays.toString(r));
+        }
+
+        return grid;
+    }
+}
+
