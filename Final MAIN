@@ -114,3 +114,9 @@ public class Main {
         return grid;
     }
 }
+
+// CITATIONS:
+// chatgpt.com
+// https://puzzling.stackexchange.com/questions/67789/examples-of-sudokus-with-two-solutions
+// https://www.sudokuonline.io/kids/numbers-6-6
+// https://www.sudoku9x9.com
