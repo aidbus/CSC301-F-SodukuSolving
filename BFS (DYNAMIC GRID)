@@ -1,0 +1,57 @@
+  import java.util.*;
+
+class SudokuBFS {
+    private int stateCount = 0; // Counter to track the number of states explored
+    private List<int[][]> solutions = new LinkedList<>(); // To store multiple solutions
+
+    public boolean solve(SudokuGraph graph) {
+        Queue<SudokuGraph> queue = new LinkedList<>();
+        queue.add(graph); // Start with the initial grid as a SudokuGraph instance
+
+        while (!queue.isEmpty()) {
+            SudokuGraph currentGraph = queue.poll(); // Get the next graph from the queue
+            stateCount++; // Increment the counter whenever a state is dequeued
+
+            // Debugging: Print the current state being processed
+            //System.out.println("Processing state " + stateCount);
+
+            // Check if the current grid is solved
+            if (currentGraph.isSolved()) {
+                // Add this solution to the solutions list
+                solutions.add(currentGraph.copyGrid());
+                // Debugging: Print the solved grid
+                currentGraph.printGrid();
+                return true; // Return true once a solution is found
+            }
+
+            // Expand the first empty cell
+            boolean expanded = false;
+            for (int row = 0; row < currentGraph.getSize(); row++) {
+                for (int col = 0; col < currentGraph.getSize(); col++) {
+                    if (currentGraph.copyGrid()[row][col] == 0) { // Found an empty cell
+                        List<Integer> possibleValues = currentGraph.getPossibleValues(row, col);
+
+                        for (int value : possibleValues) {
+                            // Create a new grid with the current value filled in
+                            int[][] nextGrid = currentGraph.copyGrid();
+                            nextGrid[row][col] = value;
+                            SudokuGraph nextGraph = new SudokuGraph(nextGrid); // Create a new SudokuGraph
+
+                            // Add the new graph to the queue to explore further
+                            queue.add(nextGraph);
+                        }
+
+                        expanded = true;
+                        break; // Stop processing further cells at this level
+                    }
+                }
+                if (expanded) break;
+            }
+        }
+
+        // Debugging: Print total states explored
+        System.out.println("BFS explored " + stateCount + " states.");
+        return false; // Return false if no solution is found
+    }
+}
+
