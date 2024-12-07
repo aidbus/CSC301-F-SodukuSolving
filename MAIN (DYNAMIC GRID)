@@ -1,3 +1,7 @@
+// Main program to solve Sudoku puzzle given 3 difficulties, an inputed grid from file or custom grid of various sizes
+//Code by Aiden Tarpinian and Josie Nelson
+// inspired by "Comparison Analysis of Breadth First Search and Depth Limited Search Algorithms in Sudoku Game"
+// by Tirsa Ninia Lina and Matheus Supriyanto Rumetna
 // imports
 MAIN  import java.io.*;
 import java.util.*;
