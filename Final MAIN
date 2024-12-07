@@ -1,5 +1,7 @@
 // Main program to solve Sudoku puzzle given 3 difficulties, an inputed grid from file or custom grid of various sizes
 //Code by Aiden Tarpinian and Josie Nelson
+// Dec 6 2024
+
 // inspired by "Comparison Analysis of Breadth First Search and Depth Limited Search Algorithms in Sudoku Game"
 // by Tirsa Ninia Lina and Matheus Supriyanto Rumetna
 // https://www.researchgate.net/publication/358642884_Comparison_Analysis_of_Breadth_First_Search_and_Depth_Limited_Search_Algorithms_in_Sudoku_Game
