@@ -1,20 +1,20 @@
-// class creates graph structure to solve sudoku puzzle, adhering to sudoku rules 
-// dec 6 2024
+// Program 3: Graph Data Structure Class - creates graph structure to solve puzzles adhhering to Sudoku rules
+// Aidan Tarpinian & Josephine Nelson
+// Dr. Lori CSC 301
+// 6 December 2024
 
-// imports
 import java.util.*;
 
 class SudokuGraph {
-    private final int[][] grid; // make sudoku grid
-    private final int size; // set size of 2D grid
+    private final int[][] grid; // Sudoku grid
+    private final int size; // Size of the grid (e.g., 9 for a 9x9 grid)
 
-    // set size and grid
     public SudokuGraph(int[][] grid) {
         this.grid = grid;
         this.size = grid.length;
     }
 
-    // returns possible values for a cell based on sudoku rules
+    // Returns possible values for a cell based on Sudoku rules
     public List<Integer> getPossibleValues(int row, int col) {
         if (grid[row][col] != 0) return Collections.singletonList(grid[row][col]); // Already filled
 
@@ -59,10 +59,17 @@ class SudokuGraph {
         return true; // All cells are filled
     }
 
-    // Prints the grid
+    // Prints the grid & maps letters with numeric values for 16x16 grids
     public void printGrid() {
         for (int[] row : grid) {
-            System.out.println(Arrays.toString(row));
+            for (int cell : row) {
+                if (cell > 9) {
+                    System.out.print((char) ('A' + cell - 10) + " ");  // Map numbers 10-16 to A-F; can be expanded more to allow larger grids if desired
+                } else {
+                    System.out.print(cell + " ");
+                }
+            }
+            System.out.println();
         }
         System.out.println();
     }
