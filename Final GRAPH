@@ -1,3 +1,6 @@
+// class creates graph structure to solve sudoku puzzle, adhering to sudoku rules 
+// dec 6 2024
+
 // imports
 import java.util.*;
 
