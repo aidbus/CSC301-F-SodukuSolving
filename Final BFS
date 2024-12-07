@@ -1,0 +1,71 @@
+import java.util.*;
+
+class SudokuBFS {
+    private int solutionCount = 0; // Counter to track the number of unique solutions found
+    private Set<String> solvedStates = new HashSet<>(); // Set to store solved grids and ensure uniqueness
+
+    public boolean solve(SudokuGraph graph) {
+        Queue<SudokuGraph> queue = new LinkedList<>();
+        queue.add(graph); // Start with the initial grid as a SudokuGraph instance
+
+        while (!queue.isEmpty()) {
+            SudokuGraph currentGraph = queue.poll(); // Get the next graph from the queue
+
+            // Check if the current grid is solved
+            if (currentGraph.isSolved()) {
+                String solvedGrid = gridToString(currentGraph); // Convert the solved grid to a string
+                if (!solvedStates.contains(solvedGrid)) { // Check if this solution is unique
+                    solvedStates.add(solvedGrid); // Add to the set of unique solutions
+                    solutionCount++; // Increment the solution count
+
+                    // Print only the first solution
+                    if (solutionCount == 1) {
+                        System.out.println("Solution (BFS):");
+                        currentGraph.printGrid();
+                    }
+                }
+                continue; // Continue to explore other possible solutions
+            }
+
+            // Expand the first empty cell
+            boolean expanded = false;
+            for (int row = 0; row < currentGraph.getSize(); row++) {
+                for (int col = 0; col < currentGraph.getSize(); col++) {
+                    if (currentGraph.getCell(row, col) == 0) { // Found an empty cell
+                        List<Integer> possibleValues = currentGraph.getPossibleValues(row, col);
+
+                        for (int value : possibleValues) {
+                            // Create a new grid with the current value filled in
+                            int[][] nextGrid = currentGraph.copyGrid();
+                            nextGrid[row][col] = value;
+                            SudokuGraph nextGraph = new SudokuGraph(nextGrid); // Create a new SudokuGraph
+
+                            // Add the new graph to the queue to explore further
+                            queue.add(nextGraph);
+                        }
+
+                        expanded = true;
+                        break; // Stop processing further cells at this level
+                    }
+                }
+                if (expanded) break;
+            }
+        }
+
+        // Print the total number of unique solutions found
+        System.out.println("Total solutions found by BFS: " + solutionCount);
+        return solutionCount > 0; // Return true if at least one solution was found
+    }
+
+    // Converts the grid to a string representation for uniqueness check
+    private String gridToString(SudokuGraph graph) {
+        StringBuilder sb = new StringBuilder();
+        int[][] grid = graph.copyGrid();
+        for (int[] row : grid) {
+            for (int cell : row) {
+                sb.append(cell);
+            }
+        }
+        return sb.toString();
+    }
+}
