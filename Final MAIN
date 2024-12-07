@@ -1,0 +1,116 @@
+import java.io.*;
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        // Read the grids from the file
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/gridsforsudoku.txt"))) {
+            int[][] easyGrid = readGrid(reader);   // Read Easy grid
+            int[][] mediumGrid = readGrid(reader); // Read Medium grid
+            int[][] hardGrid = readGrid(reader);   // Read Hard grid
+
+            // Solve and time the Easy grid with BFS and DLS
+            System.out.println("==================================\nEASY GRID:\n");
+            solveAndTimeGrid("Easy", easyGrid);
+
+            // Solve and time the Medium grid with BFS and DLS
+            System.out.println("==================================\nMEDIUM GRID:\n");
+            solveAndTimeGrid("Medium", mediumGrid);
+
+            // Solve and time the Hard grid with BFS and DLS
+            System.out.println("==================================\nHARD GRID:\n");
+            solveAndTimeGrid("Hard", hardGrid);
+
+            // Create and solve a custom grid
+            int[][] customGrid = createCustomGrid(9); // Specify the size of the custom grid here
+            System.out.println("\nCUSTOM GRID:\n");
+            solveAndTimeGrid("Custom", customGrid);
+
+        } catch (IOException e) {
+            System.out.println("Error reading the file: " + e.getMessage());
+        }
+    }
+
+    // Helper method to solve and print results for any grid
+    private static void solveAndTimeGrid(String difficulty, int[][] grid) {
+        // Solve with BFS
+        long bfsStartTime = System.nanoTime();
+        SudokuGraph bfsGraph = new SudokuGraph(grid);
+        SudokuBFS bfsSolver = new SudokuBFS();
+        boolean bfsSolved = bfsSolver.solve(bfsGraph);
+        long bfsEndTime = System.nanoTime();
+        if (bfsSolved) {
+            System.out.println(difficulty + " grid solved with BFS in " + (bfsEndTime - bfsStartTime) + " ns.\n");
+        } else {
+            System.out.println(difficulty + " grid BFS failed.\n");
+        }
+
+        // Solve with DLS
+        long dlsStartTime = System.nanoTime();
+        SudokuGraph dlsGraph = new SudokuGraph(grid);
+        SudokuDLS dlsSolver = new SudokuDLS();
+        boolean dlsSolved = dlsSolver.solve(dlsGraph, grid.length * grid.length); // Depth limit = total number of cells
+        long dlsEndTime = System.nanoTime();
+        if (dlsSolved) {
+            System.out.println(difficulty + " grid solved with DLS in " + (dlsEndTime - dlsStartTime) + " ns.\n");
+        } else {
+            System.out.println(difficulty + " grid DLS failed.\n");
+        }
+    }
+
+
+    // Helper method to read a grid dynamically based on the size in the .txt file
+    private static int[][] readGrid(BufferedReader reader) throws IOException {
+        String line;
+
+        // Skip difficulty level lines like 'easy', 'medium', 'hard'
+        while ((line = reader.readLine()) != null && (line.equalsIgnoreCase("easy") || line.equalsIgnoreCase("medium") || line.equalsIgnoreCase("hard"))) {
+            // Skip difficulty labels
+        }
+
+        // Read the first valid line to determine the grid size
+        if (line == null || line.trim().isEmpty()) {
+            throw new IllegalArgumentException("Invalid grid format: No valid rows found.");
+        }
+
+        int gridSize = line.length();  // The length of the first line determines the grid size (columns)
+        int[][] grid = new int[gridSize][gridSize];
+
+        // Now, read the grid
+        int row = 0;
+        do {
+            line = line.trim();  // Trim any whitespace
+            if (line.length() == gridSize) {
+                for (int col = 0; col < gridSize; col++) {
+                    grid[row][col] = Character.getNumericValue(line.charAt(col));  // Convert each character to a number
+                }
+                row++;
+            } else {
+                System.out.println("Skipping invalid line: '" + line + "'");
+            }
+        } while ((line = reader.readLine()) != null && row < gridSize);
+
+        // Handle case where the grid doesn't match the expected dimensions
+        if (row != gridSize) {
+            throw new IllegalArgumentException("Grid dimensions do not match: Expected " + gridSize + "x" + gridSize + " grid.");
+        }
+
+        return grid;
+    }
+
+    // Helper method to create a custom grid of a given size
+    private static int[][] createCustomGrid(int size) {
+        int[][] grid = new int[size][size];
+        // Initialize the grid with some values or leave it empty for solving
+        // Example: Fill the diagonal subgrids with values
+        int subGridSize = (int) Math.sqrt(size);
+        for (int i = 0; i < size; i += subGridSize) {
+            for (int j = 0; j < subGridSize; j++) {
+                for (int k = 0; k < subGridSize; k++) {
+                    grid[i + j][i + k] = (j * subGridSize + k + 1) % size + 1;
+                }
+            }
+        }
+        return grid;
+    }
+}
